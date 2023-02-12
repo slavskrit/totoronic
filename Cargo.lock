@@ -843,6 +843,7 @@ version = "0.1.0"
 dependencies = [
  "futures",
  "prost",
+ "rand",
  "tokio",
  "tokio-stream",
  "tonic",
