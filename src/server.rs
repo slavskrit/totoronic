@@ -1,7 +1,10 @@
-use tonic::{transport::Server, Request, Response, Status};
+use std::time::Duration;
 
 use hello_world::greeter_server::{Greeter, GreeterServer};
 use hello_world::{HelloReply, HelloRequest};
+use tokio::sync::mpsc;
+use tokio_stream::wrappers::ReceiverStream;
+use tonic::{transport::Server, Request, Response, Status};
 
 pub mod hello_world {
     tonic::include_proto!("helloworld");
@@ -12,17 +15,38 @@ pub struct MyGreeter {}
 
 #[tonic::async_trait]
 impl Greeter for MyGreeter {
+    type SayHelloStream = ReceiverStream<Result<HelloReply, Status>>;
     async fn say_hello(
         &self,
         request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
-        println!("Got a request from {:?}", request.remote_addr());
+    ) -> Result<Response<Self::SayHelloStream>, Status> {
+        let (tx, rx) = mpsc::channel(4);
 
-        let reply = hello_world::HelloReply {
-            message: format!("Hello {}!", request.into_inner().name),
-        };
-        Ok(Response::new(reply))
+        let name = request.into_inner().name;
+        tokio::spawn(async move {
+            loop {
+                tx.send(Ok(HelloReply {
+                    message: format!("Hello {}", name.clone()),
+                }))
+                .await
+                .unwrap();
+                tokio::time::sleep(Duration::from_secs(1)).await;
+            }
+        });
+
+        Ok(Response::new(ReceiverStream::new(rx)))
     }
+    // async fn say_hello(
+    //     &self,
+    //     request: Request<HelloRequest>,
+    // ) -> Result<Response<HelloReply>, Status> {
+    //     println!("Got a request from {:?}", request.remote_addr());
+
+    //     let reply = hello_world::HelloReply {
+    //         message: format!("Hello {}!", request.into_inner().name),
+    //     };
+    //     Ok(Response::new(reply))
+    // }
 }
 
 #[tokio::main]
