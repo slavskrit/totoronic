@@ -25,11 +25,12 @@ impl Greeter for MyGreeter {
         let name = request.into_inner().name;
         tokio::spawn(async move {
             loop {
-                tx.send(Ok(HelloReply {
+                let reply = HelloReply {
                     message: format!("Hello {}", name.clone()),
-                }))
-                .await
-                .unwrap();
+                };
+                tx.send(Ok(reply)).await.unwrap_or_default();
+                // .await
+                // .unwrap();
                 tokio::time::sleep(Duration::from_secs(1)).await;
             }
         });
