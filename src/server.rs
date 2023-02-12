@@ -29,25 +29,12 @@ impl Greeter for MyGreeter {
                     message: format!("Hello {}", name.clone()),
                 };
                 tx.send(Ok(reply)).await.unwrap_or_default();
-                // .await
-                // .unwrap();
-                tokio::time::sleep(Duration::from_secs(1)).await;
+                tokio::time::sleep(Duration::from_millis(10)).await;
             }
         });
 
         Ok(Response::new(ReceiverStream::new(rx)))
     }
-    // async fn say_hello(
-    //     &self,
-    //     request: Request<HelloRequest>,
-    // ) -> Result<Response<HelloReply>, Status> {
-    //     println!("Got a request from {:?}", request.remote_addr());
-
-    //     let reply = hello_world::HelloReply {
-    //         message: format!("Hello {}!", request.into_inner().name),
-    //     };
-    //     Ok(Response::new(reply))
-    // }
 }
 
 #[tokio::main]
