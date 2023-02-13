@@ -1,20 +1,18 @@
-use hello_world::greeter_client::GreeterClient;
-use hello_world::HelloRequest;
+use telemetry::telemetry_client::TelemetryClient;
+use telemetry::HeatMapRequest;
 
-pub mod hello_world {
-    tonic::include_proto!("helloworld");
+pub mod telemetry {
+    tonic::include_proto!("telemetry");
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = GreeterClient::connect("http://[::1]:8000").await?;
+    let mut client = TelemetryClient::connect("http://[::1]:8000").await?;
 
-    let request = tonic::Request::new(HelloRequest {
+    let request = tonic::Request::new(HeatMapRequest {
         name: format!("yo").into(),
     });
-    let mut response = client.say_hello(request).await?.into_inner();
-    while let Some(res) = response.message().await? {
-        println!("{}", res.message);
-    }
+    let response = client.get_heat_map(request).await?.into_inner();
+    println!("{}", response.message);
     Ok(())
 }

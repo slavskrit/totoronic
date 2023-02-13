@@ -1,0 +1,14 @@
+syntax = "proto3";
+package telemetry;
+
+service Telemetry {
+    rpc getHeatMap(HeatMapRequest) returns (HeatMapResponse);
+}
+
+message HeatMapRequest {
+    string name = 1;
+}
+
+message HeatMapResponse {
+    string message = 1;
+}
