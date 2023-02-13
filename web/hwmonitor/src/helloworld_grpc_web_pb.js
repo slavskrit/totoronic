@@ -130,5 +130,66 @@ proto.helloworld.GreeterPromiseClient.prototype.sayHello =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.helloworld.HelloRequest,
+ *   !proto.helloworld.HelloReply>}
+ */
+const methodDescriptor_Greeter_test = new grpc.web.MethodDescriptor(
+  '/helloworld.Greeter/test',
+  grpc.web.MethodType.UNARY,
+  proto.helloworld.HelloRequest,
+  proto.helloworld.HelloReply,
+  /**
+   * @param {!proto.helloworld.HelloRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.helloworld.HelloReply.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.helloworld.HelloRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.helloworld.HelloReply)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.helloworld.HelloReply>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.helloworld.GreeterClient.prototype.test =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/helloworld.Greeter/test',
+      request,
+      metadata || {},
+      methodDescriptor_Greeter_test,
+      callback);
+};
+
+
+/**
+ * @param {!proto.helloworld.HelloRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.helloworld.HelloReply>}
+ *     Promise that resolves to the response
+ */
+proto.helloworld.GreeterPromiseClient.prototype.test =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/helloworld.Greeter/test',
+      request,
+      metadata || {},
+      methodDescriptor_Greeter_test);
+};
+
+
 module.exports = proto.helloworld;
 

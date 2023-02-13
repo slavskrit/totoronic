@@ -862,6 +862,7 @@ name = "totoronic"
 version = "0.1.0"
 dependencies = [
  "futures",
+ "http",
  "prost",
  "rand",
  "tokio",
@@ -869,6 +870,7 @@ dependencies = [
  "tonic",
  "tonic-build",
  "tonic-web",
+ "tower-http",
 ]
 
 [[package]]

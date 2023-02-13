@@ -4,6 +4,7 @@ package helloworld;
 service Greeter {
     // Our SayHello rpc accepts HelloRequests and returns HelloReplies
     rpc SayHello (HelloRequest) returns (stream HelloReply);
+    rpc test (HelloRequest) returns (HelloReply);
 }
 
 message HelloRequest {
