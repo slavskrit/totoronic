@@ -29,14 +29,12 @@ impl TelemetryService for TelemetryImpl {
         println!("Incoming request: {}", request.into_inner().name);
         tokio::spawn(async move {
             loop {
-                tokio::time::sleep(Duration::from_millis(1000)).await;
-                // let rng = rand::thread_rng();
+                tokio::time::sleep(Duration::from_millis(10)).await;
                 let s: String = rand::thread_rng()
                     .sample_iter(&Alphanumeric)
                     .take(100)
                     .map(char::from)
                     .collect();
-                // println!("{s}");
                 let reply = HeatMapResponse {
                     message: format!("{}", s),
                 };

@@ -1,26 +1,22 @@
-import { observable, createResource, Suspense } from "solid-js";
+import { observable, createSignal, from, createResource, Suspense } from "solid-js";
 import { GrpcWebImpl, TelemetryServiceClientImpl, HeatMapRequest } from './telemetry';
-import { from } from "rxjs";
-
-const fetchJokes = async () => (await echoService.getHeatMap({ name: "test" }));
+import { Subject } from 'rxjs';
+const fetchJokes = async () => (await echoService.GetHeatMap({ name: "test" }));
 
 const rpc = new GrpcWebImpl('http://localhost:8000', {});
 const echoService = new TelemetryServiceClientImpl(rpc);
 
+function ComponentWithResource() {
+  const [value, setValue] = createSignal("");
+  const [jokes] = createResource(fetchJokes);
+  return <div>{value }{jokes()?.subscribe((v) => setValue(v.message))}</div>;
+}
+
 function App() {
-  const [jokes] = createResource(fetchJokes);  // Here we use createResource to associate from the fetchJokes promise to the results: the jokes variable
-  const obsv$ = from(observable(jokes));
-
-  obsv$.subscribe((v) => console.log(v));
-
-  return (
-    <>
-      <h1>Welcome</h1>
-      <Suspense fallback={<p>Loading...</p>}>
-      {/* {jokes()?.message} */}
-      </Suspense>
-    </>
-  );
+  return <>
+    <h1>Test</h1>
+    <ComponentWithResource />
+  </>
 }
 
 export default App;

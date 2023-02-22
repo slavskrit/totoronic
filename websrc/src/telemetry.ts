@@ -118,7 +118,7 @@ export const HeatMapResponse = {
 };
 
 export interface TelemetryService {
-  getHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Observable<HeatMapResponse>;
+  GetHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Observable<HeatMapResponse>;
 }
 
 export class TelemetryServiceClientImpl implements TelemetryService {
@@ -126,18 +126,18 @@ export class TelemetryServiceClientImpl implements TelemetryService {
 
   constructor(rpc: Rpc) {
     this.rpc = rpc;
-    this.getHeatMap = this.getHeatMap.bind(this);
+    this.GetHeatMap = this.GetHeatMap.bind(this);
   }
 
-  getHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Observable<HeatMapResponse> {
-    return this.rpc.invoke(TelemetryServicegetHeatMapDesc, HeatMapRequest.fromPartial(request), metadata);
+  GetHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Observable<HeatMapResponse> {
+    return this.rpc.invoke(TelemetryServiceGetHeatMapDesc, HeatMapRequest.fromPartial(request), metadata);
   }
 }
 
 export const TelemetryServiceDesc = { serviceName: "telemetry.TelemetryService" };
 
-export const TelemetryServicegetHeatMapDesc: UnaryMethodDefinitionish = {
-  methodName: "getHeatMap",
+export const TelemetryServiceGetHeatMapDesc: UnaryMethodDefinitionish = {
+  methodName: "GetHeatMap",
   service: TelemetryServiceDesc,
   requestStream: false,
   responseStream: true,
