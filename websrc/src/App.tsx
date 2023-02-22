@@ -6,7 +6,7 @@ import { createResource } from "solid-js";
 const [count, setCount] = createSignal(0);
 const [message, setMessage] = createSignal(0);
 
-const fetchJokes = async (id) => (await fetch(`https://official-joke-api.appspot.com/jokes/programming/ten`)).json();
+const fetchJokes = async (id) => (await echoService.getHeatMap({ name: "test" }));
 
 const rpc = new GrpcWebImpl('http://localhost:8000', {'Content-Type': 'application/grpc-web+proto'});
 const echoService = new TelemetryServiceClientImpl(rpc);
@@ -17,7 +17,7 @@ function App() {
   // const request = HeatMapRequest() {
   //   name: "test"
   // };
-  // const response = await echoService.getHeatMap({ name: "test" });
+  // const response = ;
   // const [count, setCount] = createSignal(0),
   // timer = setInterval(() => setCount(count() + 1), 1000);
   // setMessage(response.message);
@@ -25,7 +25,7 @@ function App() {
     <>
       <h1>Welcome</h1>
       <Suspense fallback={<p>Loading...</p>}>
-      {JSON.stringify(jokes(), null, 2)}
+      {JSON.stringify(jokes())}
         {/* <Greeting name="Jake" /> */}
       </Suspense>
     </>
