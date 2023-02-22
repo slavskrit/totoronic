@@ -2,6 +2,8 @@
 import { grpc } from "@improbable-eng/grpc-web";
 import { BrowserHeaders } from "browser-headers";
 import _m0 from "protobufjs/minimal";
+import { Observable } from "rxjs";
+import { share } from "rxjs/operators";
 
 export const protobufPackage = "telemetry";
 
@@ -116,7 +118,7 @@ export const HeatMapResponse = {
 };
 
 export interface TelemetryService {
-  getHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Promise<HeatMapResponse>;
+  getHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Observable<HeatMapResponse>;
 }
 
 export class TelemetryServiceClientImpl implements TelemetryService {
@@ -127,8 +129,8 @@ export class TelemetryServiceClientImpl implements TelemetryService {
     this.getHeatMap = this.getHeatMap.bind(this);
   }
 
-  getHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Promise<HeatMapResponse> {
-    return this.rpc.unary(TelemetryServicegetHeatMapDesc, HeatMapRequest.fromPartial(request), metadata);
+  getHeatMap(request: DeepPartial<HeatMapRequest>, metadata?: grpc.Metadata): Observable<HeatMapResponse> {
+    return this.rpc.invoke(TelemetryServicegetHeatMapDesc, HeatMapRequest.fromPartial(request), metadata);
   }
 }
 
@@ -138,7 +140,7 @@ export const TelemetryServicegetHeatMapDesc: UnaryMethodDefinitionish = {
   methodName: "getHeatMap",
   service: TelemetryServiceDesc,
   requestStream: false,
-  responseStream: false,
+  responseStream: true,
   requestType: {
     serializeBinary() {
       return HeatMapRequest.encode(this).finish();
@@ -170,13 +172,18 @@ interface Rpc {
     request: any,
     metadata: grpc.Metadata | undefined,
   ): Promise<any>;
+  invoke<T extends UnaryMethodDefinitionish>(
+    methodDesc: T,
+    request: any,
+    metadata: grpc.Metadata | undefined,
+  ): Observable<any>;
 }
 
 export class GrpcWebImpl {
   private host: string;
   private options: {
     transport?: grpc.TransportFactory;
-
+    streamingTransport?: grpc.TransportFactory;
     debug?: boolean;
     metadata?: grpc.Metadata;
     upStreamRetryCodes?: number[];
@@ -186,7 +193,7 @@ export class GrpcWebImpl {
     host: string,
     options: {
       transport?: grpc.TransportFactory;
-
+      streamingTransport?: grpc.TransportFactory;
       debug?: boolean;
       metadata?: grpc.Metadata;
       upStreamRetryCodes?: number[];
@@ -222,6 +229,45 @@ export class GrpcWebImpl {
         },
       });
     });
+  }
+
+  invoke<T extends UnaryMethodDefinitionish>(
+    methodDesc: T,
+    _request: any,
+    metadata: grpc.Metadata | undefined,
+  ): Observable<any> {
+    const upStreamCodes = this.options.upStreamRetryCodes || [];
+    const DEFAULT_TIMEOUT_TIME: number = 3_000;
+    const request = { ..._request, ...methodDesc.requestType };
+    const maybeCombinedMetadata = metadata && this.options.metadata
+      ? new BrowserHeaders({ ...this.options?.metadata.headersMap, ...metadata?.headersMap })
+      : metadata || this.options.metadata;
+    return new Observable((observer) => {
+      const upStream = (() => {
+        const client = grpc.invoke(methodDesc, {
+          host: this.host,
+          request,
+          transport: this.options.streamingTransport || this.options.transport,
+          metadata: maybeCombinedMetadata,
+          debug: this.options.debug,
+          onMessage: (next) => observer.next(next),
+          onEnd: (code: grpc.Code, message: string, trailers: grpc.Metadata) => {
+            if (code === 0) {
+              observer.complete();
+            } else if (upStreamCodes.includes(code)) {
+              setTimeout(upStream, DEFAULT_TIMEOUT_TIME);
+            } else {
+              const err = new Error(message) as any;
+              err.code = code;
+              err.metadata = trailers;
+              observer.error(err);
+            }
+          },
+        });
+        observer.add(() => client.close());
+      });
+      upStream();
+    }).pipe(share());
   }
 }
 

@@ -2,7 +2,7 @@ syntax = "proto3";
 package telemetry;
 
 service TelemetryService {
-    rpc getHeatMap(HeatMapRequest) returns (HeatMapResponse);
+    rpc GetHeatMap(HeatMapRequest) returns (stream HeatMapResponse);
 }
 
 message HeatMapRequest {
