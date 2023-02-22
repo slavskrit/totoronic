@@ -32,7 +32,7 @@ impl TelemetryService for TelemetryImpl {
                 tokio::time::sleep(Duration::from_millis(10)).await;
                 let s: String = rand::thread_rng()
                     .sample_iter(&Alphanumeric)
-                    .take(100)
+                    .take(1000)
                     .map(char::from)
                     .collect();
                 let reply = HeatMapResponse {

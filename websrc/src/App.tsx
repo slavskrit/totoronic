@@ -9,7 +9,10 @@ const echoService = new TelemetryServiceClientImpl(rpc);
 function ComponentWithResource() {
   const [value, setValue] = createSignal("");
   const [jokes] = createResource(fetchJokes);
-  return <div>{value }{jokes()?.subscribe((v) => setValue(v.message))}</div>;
+  return <div style={{
+    width: '500px',
+    'word-break': 'break-all',
+}}>{value }{jokes()?.subscribe((v) => setValue(v.message))}</div>;
 }
 
 function App() {
@@ -20,3 +23,5 @@ function App() {
 }
 
 export default App;
+// width: 200px;
+// word-break: break-all;
