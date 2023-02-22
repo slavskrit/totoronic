@@ -1,5 +1,5 @@
 use http::Method;
-use telemetry::telemetry_server::{Telemetry, TelemetryServer};
+use telemetry::telemetry_service_server::{TelemetryService, TelemetryServiceServer};
 use telemetry::{HeatMapRequest, HeatMapResponse};
 use tonic::{transport::Server, Request, Response, Status};
 use tonic_web::GrpcWebLayer;
@@ -13,7 +13,7 @@ pub mod telemetry {
 pub struct TelemetryImpl {}
 
 #[tonic::async_trait]
-impl Telemetry for TelemetryImpl {
+impl TelemetryService for TelemetryImpl {
     async fn get_heat_map(
         &self,
         request: Request<HeatMapRequest>,
@@ -29,7 +29,7 @@ impl Telemetry for TelemetryImpl {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let port = "8000";
     let addr = format!("[::1]:{port}").parse().unwrap();
-    let greeter = TelemetryServer::new(TelemetryImpl::default());
+    let greeter = TelemetryServiceServer::new(TelemetryImpl::default());
 
     println!("Starting server at {port}");
 
