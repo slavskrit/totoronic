@@ -10,14 +10,14 @@ function ComponentWithResource() {
   const [value, setValue] = createSignal("");
   const [jokes] = createResource(fetchJokes);
   return <div style={{
-    width: '500px',
+    width: '100%',
     'word-break': 'break-all',
 }}>{value }{jokes()?.subscribe((v) => setValue(v.message))}</div>;
 }
 
 function App() {
   return <>
-    <h1>Test</h1>
+    <h1>Data streamed from rust server</h1>
     <ComponentWithResource />
   </>
 }
