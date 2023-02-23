@@ -2,4 +2,6 @@
 
 In this example app you can see how you can stream gRPC data from `RUST` server to the `SolidJS` frontend.
 
-https://github.com/slavskrit/totoronic/blob/master/video.webm?raw=true
+
+<video src="https://github.com/slavskrit/totoronic/blob/master/video.webm?raw=true" controls="controls" style="max-width: 730px;">
+</video>
